@@ -10,22 +10,34 @@ const App = () => {
   return (
     <div className="app">
       <h1>Hello World!</h1>
-      <p>localDescription: {localDescription}</p>
-      <input
-        value={remoteDescriptionString}
-        onChange={(e) => {
-          setRemoteDescriptionString(e.target.value);
-        }}
-      />
-      <button
-        onClick={() => {
-          if (!remoteDescriptionString) return;
+      <div>
+        <button
+          disabled={!localDescription}
+          onClick={() => {
+            localDescription && navigator.clipboard.writeText(localDescription);
+          }}
+        >
+          Copy local description
+        </button>
+      </div>
+      <div>
+        <input
+          value={remoteDescriptionString}
+          onChange={(e) => {
+            setRemoteDescriptionString(e.target.value);
+          }}
+        />
+        <button
+          onClick={() => {
+            if (!remoteDescriptionString) return;
 
-          setRemoteDescription(remoteDescriptionString);
-        }}
-      >
-        Connect
-      </button>
+            setRemoteDescription(remoteDescriptionString);
+          }}
+        >
+          Connect
+        </button>
+      </div>
+
       {localStream && <p>Local</p>}
       {localStream && <ReactPlayer url={localStream} controls />}
       <p>Remote</p>
