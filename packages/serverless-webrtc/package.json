@@ -2,17 +2,23 @@
   "name": "serverless-webrtc",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "lib/esm/src/index.js",
+  "files": ["lib/esm/src"],
+  "types": "lib/esm/src/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "pnpm tsc --build",
+    "build:clean": "pnpm run clean-lib && pnpm run build",
+    "clean-lib": "rimraf lib/*"
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "react": "^17.0.2"
+  "peerDependencies": {
+    "react": "17.x"
   },
   "devDependencies": {
     "@types/react": "^17.0.24",
+    "react": "^17.0.2",
+    "rimraf": "^3.0.2",
     "typescript": "^4.4.3"
   }
 }

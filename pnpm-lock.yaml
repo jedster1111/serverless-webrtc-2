@@ -2,6 +2,19 @@ lockfileVersion: 5.3
 
 importers:
 
+  .:
+    specifiers:
+      eslint-scope: ^5.1.1
+      mime-types: ^2.1.32
+      multicast-dns-service-types: ^1.1.0
+      typescript: ^4.4.3
+    dependencies:
+      eslint-scope: 5.1.1
+      mime-types: 2.1.32
+      multicast-dns-service-types: 1.1.0
+    devDependencies:
+      typescript: 4.4.3
+
   packages/playground:
     specifiers:
       '@types/react-dom': ^17.0.9
@@ -12,6 +25,7 @@ importers:
       react: 17.0.2
       react-dom: 17.0.2
       rimraf: ^3.0.2
+      serverless-webrtc: workspace:1.0.0
       style-loader: ^3.3.0
       ts-loader: ^9.2.6
       typescript: ^4.4.3
@@ -22,6 +36,7 @@ importers:
     dependencies:
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
+      serverless-webrtc: link:../serverless-webrtc
     devDependencies:
       '@types/react-dom': 17.0.9
       css-loader: 6.3.0_webpack@5.54.0
@@ -41,11 +56,12 @@ importers:
     specifiers:
       '@types/react': ^17.0.24
       react: ^17.0.2
+      rimraf: ^3.0.2
       typescript: ^4.4.3
-    dependencies:
-      react: 17.0.2
     devDependencies:
       '@types/react': 17.0.24
+      react: 17.0.2
+      rimraf: 3.0.2
       typescript: 4.4.3
 
 packages:
@@ -1426,7 +1442,6 @@ packages:
     dependencies:
       esrecurse: 4.3.0
       estraverse: 4.3.0
-    dev: true
 
   /esprima/4.0.1:
     resolution: {integrity: sha512-eGuFFw7Upda+g4p+QHvnW0RyTX/SVeJBDM/gCtMARO0cLuT2HcEKnTPvhjV6aGeqrCB/sbNop0Kszm0jsaWU4A==}
@@ -1440,17 +1455,14 @@ packages:
     engines: {node: '>=4.0'}
     dependencies:
       estraverse: 5.2.0
-    dev: true
 
   /estraverse/4.3.0:
     resolution: {integrity: sha512-39nnKffWz8xN1BU/2c79n9nB9HDzo0niYUqx6xyqUnyoAnQyyWpOTdZEeiCch8BBu515t4wp9ZmgVfVhn9EBpw==}
     engines: {node: '>=4.0'}
-    dev: true
 
   /estraverse/5.2.0:
     resolution: {integrity: sha512-BxbNGGNm0RyRYvUdHpIwv9IWzeM9XClbOxwoATuFdOE7ZE6wHL+HQ5T8hoPM+zHvmKzzsEqhgy0GrQ5X13afiQ==}
     engines: {node: '>=4.0'}
-    dev: true
 
   /etag/1.8.1:
     resolution: {integrity: sha1-Qa4u62XvpiJorr/qg6x9eSmbCIc=}
@@ -2687,7 +2699,6 @@ packages:
 
   /js-tokens/4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
-    dev: false
 
   /js-yaml/3.14.1:
     resolution: {integrity: sha512-okMH7OXXJ7YrN9Ok3/SXrnu4iX9yOk+25nqX4imS2npuvTYDmo/QEZoqwZkYaIDk3jVvBOTOIEgEhaLOynBS9g==}
@@ -2793,7 +2804,6 @@ packages:
     hasBin: true
     dependencies:
       js-tokens: 4.0.0
-    dev: false
 
   /loud-rejection/1.6.0:
     resolution: {integrity: sha1-W0b4AUft7leIcPCG0Eghz5mOVR8=}
@@ -2938,7 +2948,6 @@ packages:
   /mime-db/1.49.0:
     resolution: {integrity: sha512-CIc8j9URtOVApSFCQIF+VBkX1RwXp/oMMOrqdyXSBXq5RWNEsRfyj1kiRnQgmNXmHxPoFIxOroKA3zcU9P+nAA==}
     engines: {node: '>= 0.6'}
-    dev: true
 
   /mime-db/1.50.0:
     resolution: {integrity: sha512-9tMZCDlYHqeERXEHO9f/hKfNXhre5dK2eE/krIvUjZbS2KPcqGDfNShIWS1uW9XOTKQKqK6qbeOci18rbfW77A==}
@@ -2950,7 +2959,6 @@ packages:
     engines: {node: '>= 0.6'}
     dependencies:
       mime-db: 1.49.0
-    dev: true
 
   /mime/1.6.0:
     resolution: {integrity: sha512-x0Vn8spI+wuJ1O6S7gnbaQg8Pxh4NNHb7KSINmEWKiPE4RKOplvijn+NkmYmmRgP68mc70j2EbeTFRsrswaQeg==}
@@ -3020,7 +3028,6 @@ packages:
 
   /multicast-dns-service-types/1.1.0:
     resolution: {integrity: sha1-iZ8R2WhuXgXLkbNdXw5jt3PPyQE=}
-    dev: true
 
   /multicast-dns/6.2.3:
     resolution: {integrity: sha512-ji6J5enbMyGRHIAkAOu3WdV8nggqviKCEKtXcOqfphZZtQrmHKycfynJ2V7eVPUA4NhJ6V7Wf4TmGbTwKE9B6g==}
@@ -3723,7 +3730,6 @@ packages:
     dependencies:
       loose-envify: 1.4.0
       object-assign: 4.1.1
-    dev: false
 
   /read-pkg-up/1.0.1:
     resolution: {integrity: sha1-nWPBMnbAZZGNV/ACpX9AobZD+wI=}

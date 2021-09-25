@@ -1,0 +1,19 @@
+{
+  "name": "root",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "eslint-scope": "^5.1.1",
+    "mime-types": "^2.1.32",
+    "multicast-dns-service-types": "^1.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.4.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

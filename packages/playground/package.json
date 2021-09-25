@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "pnpm run clean-dist && webpack --config=configs/webpack/prod.js",
+    "build": "webpack --config=configs/webpack/prod.js",
+    "build:clean": "pnpm run clean-dist && pnpm run build",
     "clean-dist": "rimraf dist/*",
     "start": "pnpm run start-dev",
     "start-dev": "webpack serve --config=configs/webpack/dev.js"
@@ -28,6 +29,7 @@
   },
   "dependencies": {
     "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "react-dom": "17.0.2",
+    "serverless-webrtc": "workspace:1.0.0"
   }
 }
