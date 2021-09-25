@@ -13,10 +13,9 @@ async function getLocalStream() {
 
 export const useServerlessWebRTC = () => {
   const [peerConnection, setPeerConnection] = useState<RTCPeerConnection>();
-  const [localMediaStream, setLocalMediaStream] = useState<MediaStream>();
+  const [localStream, setLocalStream] = useState<MediaStream>();
   const [remoteStream, setRemoteStream] = useState<MediaStream>();
-  const [isIceGatheringComplete, setIsIceGatheringComplete] =
-    useState(false);
+  const [isIceGatheringComplete, setIsIceGatheringComplete] = useState(false);
   const [localDescription, setLocalDescription] =
     useState<RTCSessionDescription>();
 
@@ -26,23 +25,27 @@ export const useServerlessWebRTC = () => {
       const localMediaStream = await getLocalStream();
 
       setPeerConnection(peerConnection);
-      setLocalMediaStream(localMediaStream);
+      setLocalStream(localMediaStream);
     };
 
     setup();
   }, []);
 
   useEffect(() => {
-    if (!peerConnection || !localMediaStream) return;
+    if (!peerConnection || !localStream) return;
 
-    for (const track of localMediaStream.getTracks()) {
-      peerConnection.addTrack(track, localMediaStream);
+    for (const track of localStream.getTracks()) {
+      console.log("Adding local tracks", track)
+      peerConnection.addTrack(track, localStream);
     }
 
     peerConnection.ontrack = ({ track, streams }) => {
+      console.log("Received remote track!", track.id)
       track.onunmute = () => {
+        console.log("Track unmuted!", track.id)
         if (remoteStream) return;
-
+        
+        console.log("Use this stream in state!", track.id)
         setRemoteStream(streams[0]);
       };
     };
@@ -53,7 +56,7 @@ export const useServerlessWebRTC = () => {
     };
 
     peerConnection.onicecandidate = ({ candidate }) => {
-      console.log("On ice candidate:", candidate?.toJSON());
+      console.log("Received Ice Candidate");
 
       if (candidate === null) {
         // At this point ICE candidate collection has completed
@@ -72,27 +75,35 @@ export const useServerlessWebRTC = () => {
         setLocalDescription(peerConnection.localDescription || undefined);
       }
     };
-  }, [peerConnection, localMediaStream]);
+  }, [peerConnection, localStream]);
 
-  const setRemoteDescription = async (
-    remoteDescription: RTCSessionDescription
-  ) => {
+  const setRemoteDescription = async (remoteDescriptionString: string) => {
     if (!peerConnection)
       throw new Error(
         "Tried to set remote description before Peer Connection was created."
       );
 
+    const remoteDescription = JSON.parse(
+      remoteDescriptionString
+    ) as RTCSessionDescription;
+    
+
     await peerConnection.setRemoteDescription(remoteDescription);
 
     if (remoteDescription.type === "offer") {
+      setLocalDescription(undefined)
       await peerConnection.setLocalDescription();
       setLocalDescription(peerConnection.localDescription || undefined);
     }
   };
 
   return {
-    isIceGatheringComplete,
-    localDescription,
-    setRemoteDescription
-  }
+    localDescription:
+      isIceGatheringComplete && localDescription
+        ? JSON.stringify(localDescription)
+        : undefined,
+    setRemoteDescription,
+    localStream,
+    remoteStream
+  };
 };
