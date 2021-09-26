@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 
+type FindByType<Union, Type> = Union extends { type: Type } ? Union : never;
+
 export type BaseMessage<
   T extends string = string,
   D = undefined
@@ -18,9 +20,10 @@ const defaultRTCConfig: RTCConfiguration = {
   iceServers: [],
 };
 
-export const useServerlessWebRTC = <Message extends BaseMessage<string, any>>(
-  onMessage: (message: Message) => void
-) => {
+export const useServerlessWebRTC = <
+  MessageTypes extends string,
+  Message extends BaseMessage<MessageTypes, any>
+>() => {
   const [peerConnection, setPeerConnection] = useState<RTCPeerConnection>();
   const [localStream, setLocalStream] = useState<MediaStream>();
   const [remoteStream, setRemoteStream] = useState<MediaStream>();
@@ -28,6 +31,10 @@ export const useServerlessWebRTC = <Message extends BaseMessage<string, any>>(
   const [isIceGatheringComplete, setIsIceGatheringComplete] = useState(false);
   const [localDescription, setLocalDescription] =
     useState<RTCSessionDescription>();
+
+  const [messageHandlers, setMessageHandlers] = useState<{
+    [T in Message["type"]]?: (message: FindByType<Message, T>) => void;
+  }>({});
 
   useEffect(() => {
     const setup = async () => {
@@ -105,9 +112,18 @@ export const useServerlessWebRTC = <Message extends BaseMessage<string, any>>(
     dataChannel.onopen = (event) => {
       console.log("Opened 'text' data channel.", event);
     };
+  }, [peerConnection, localStream]);
 
-    dataChannel.onmessage = (event) => {
-      let message: Message | undefined;
+  useEffect(() => {
+    if (!textDataChannel) return;
+
+    console.log(
+      "Setting up data channel handlers!",
+      Object.keys(messageHandlers)
+    );
+
+    textDataChannel.onmessage = (event) => {
+      let message: FindByType<Message, MessageTypes> | undefined;
       try {
         message = JSON.parse(event.data);
       } catch (error) {
@@ -124,9 +140,19 @@ export const useServerlessWebRTC = <Message extends BaseMessage<string, any>>(
         return;
       }
 
-      onMessage(message);
+      const messageHandler = messageHandlers[message.type];
+
+      if (!messageHandler) {
+        console.warn(
+          "No handler registered for message with type:",
+          message.type
+        );
+        return;
+      }
+
+      messageHandler(message);
     };
-  }, [peerConnection, localStream]);
+  }, [textDataChannel, messageHandlers]);
 
   const setRemoteDescription = async (remoteDescriptionString: string) => {
     if (!peerConnection)
@@ -154,6 +180,17 @@ export const useServerlessWebRTC = <Message extends BaseMessage<string, any>>(
     textDataChannel.send(JSON.stringify(message));
   };
 
+  const registerEventHandler = <T extends Message["type"]>(
+    messageType: T,
+    handler: (message: FindByType<Message, T>) => void
+  ) => {
+    console.log("Registering handler for message with type:", messageType);
+    setMessageHandlers((prev) => ({
+      ...prev,
+      [messageType]: handler,
+    }));
+  };
+
   return {
     localDescription:
       isIceGatheringComplete && localDescription
@@ -163,5 +200,6 @@ export const useServerlessWebRTC = <Message extends BaseMessage<string, any>>(
     localStream,
     remoteStream,
     sendMessage,
+    registerEventHandler,
   };
 };

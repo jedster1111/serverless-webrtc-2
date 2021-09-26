@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useServerlessWebRTC, BaseMessage } from "serverless-webrtc";
 import ReactPlayer from "react-player";
 
@@ -11,21 +11,23 @@ const App = () => {
   const [remoteDescriptionString, setRemoteDescriptionString] = useState("");
   const [message, setMessage] = useState("");
 
-  const handleMessage = (message: Messages) => {
-    if (message.type === "text-message") {
-      console.log("Got text-message:", message.data);
-    }
-    if (message.type === "ping") {
-      console.log("Got ping message");
-    }
-  };
   const {
     localDescription,
     setRemoteDescription,
     localStream,
     remoteStream,
     sendMessage,
-  } = useServerlessWebRTC<Messages>(handleMessage);
+    registerEventHandler,
+  } = useServerlessWebRTC<Messages["type"], Messages>();
+
+  useEffect(() => {
+    registerEventHandler("text-message", (message) => {
+      console.log("Received text-message:", message.data);
+    });
+    registerEventHandler("ping", () => {
+      console.log("Received ping-message.");
+    });
+  }, []);
   return (
     <div className="app">
       <h1>Hello World!</h1>
