@@ -8,7 +8,8 @@
   "scripts": {
     "build": "pnpm tsc --build",
     "build:clean": "pnpm run clean-lib && pnpm run build",
-    "clean-lib": "rimraf lib/*"
+    "clean-lib": "rimraf lib/*",
+    "preinstall": "npx only-allow pnpm"
   },
   "author": "",
   "license": "ISC",
