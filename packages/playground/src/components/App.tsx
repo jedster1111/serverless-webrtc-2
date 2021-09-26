@@ -4,9 +4,15 @@ import ReactPlayer from "react-player";
 
 const App = () => {
   const [remoteDescriptionString, setRemoteDescriptionString] = useState("");
+  const [message, setMessage] = useState("");
 
-  const { localDescription, setRemoteDescription, localStream, remoteStream } =
-    useServerlessWebRTC();
+  const {
+    localDescription,
+    setRemoteDescription,
+    localStream,
+    remoteStream,
+    sendMessage,
+  } = useServerlessWebRTC();
   return (
     <div className="app">
       <h1>Hello World!</h1>
@@ -38,10 +44,25 @@ const App = () => {
         </button>
       </div>
 
+      <input
+        value={message}
+        onChange={(e) => {
+          setMessage(e.target.value);
+        }}
+      />
+      <button
+        onClick={() => {
+          sendMessage(message);
+          setMessage("");
+        }}
+      >
+        Send Message
+      </button>
+
       {localStream && <p>Local</p>}
-      {localStream && <ReactPlayer url={localStream} controls />}
+      {localStream && <ReactPlayer url={localStream} controls muted playing />}
       <p>Remote</p>
-      {remoteStream && <ReactPlayer url={remoteStream} controls />}
+      {remoteStream && <ReactPlayer url={remoteStream} controls muted />}
     </div>
   );
 };
