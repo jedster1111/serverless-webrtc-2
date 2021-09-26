@@ -11,7 +11,7 @@ async function getLocalStream() {
   });
 }
 
-export const useServerlessWebRTC = () => {
+export const useServerlessWebRTC = (onMessage: (message: string) => void) => {
   const [peerConnection, setPeerConnection] = useState<RTCPeerConnection>();
   const [localStream, setLocalStream] = useState<MediaStream>();
   const [remoteStream, setRemoteStream] = useState<MediaStream>();
@@ -60,7 +60,6 @@ export const useServerlessWebRTC = () => {
       console.log("Received Ice Candidate");
 
       if (candidate === null) {
-        // At this point ICE candidate collection has completed
         console.log("Received null candidate");
       }
     };
@@ -96,7 +95,7 @@ export const useServerlessWebRTC = () => {
     };
 
     dataChannel.onmessage = (e) => {
-      console.log("Received message over dataChannel:", e.data);
+      onMessage(e.data)
     };
   }, [peerConnection, localStream]);
 

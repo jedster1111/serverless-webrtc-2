@@ -12,7 +12,9 @@ const App = () => {
     localStream,
     remoteStream,
     sendMessage,
-  } = useServerlessWebRTC();
+  } = useServerlessWebRTC((message) =>
+    console.log("Received message:", message)
+  );
   return (
     <div className="app">
       <h1>Hello World!</h1>
