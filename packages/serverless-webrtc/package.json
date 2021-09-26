@@ -2,9 +2,9 @@
   "name": "serverless-webrtc",
   "version": "1.0.0",
   "description": "",
-  "main": "lib/esm/src/index.js",
+  "main": "lib/src/index.js",
   "files": ["lib/esm/src"],
-  "types": "lib/esm/src/index.d.ts",
+  "types": "lib/src/index.d.ts",
   "scripts": {
     "build": "pnpm tsc --build",
     "build:clean": "pnpm run clean-lib && pnpm run build",
