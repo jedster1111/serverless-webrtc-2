@@ -17,7 +17,7 @@ type MessageWithoutData<T extends string> = {
 };
 
 const defaultRTCConfig: RTCConfiguration = {
-  iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+  iceServers: [],
 };
 
 export const useServerlessWebRTC = <
