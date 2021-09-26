@@ -1,17 +1,26 @@
 import { useState, useEffect } from "react";
 
+export type BaseMessage<
+  T extends string = string,
+  D = undefined
+> = D extends undefined ? MessageWithoutData<T> : MessageWithData<T, D>;
+
+type MessageWithData<T extends string, D> = {
+  type: T;
+  data: D;
+};
+
+type MessageWithoutData<T extends string> = {
+  type: T;
+};
+
 const defaultRTCConfig: RTCConfiguration = {
   iceServers: [],
 };
 
-async function getLocalStream() {
-  return await navigator.mediaDevices.getUserMedia({
-    audio: true,
-    video: true,
-  });
-}
-
-export const useServerlessWebRTC = (onMessage: (message: string) => void) => {
+export const useServerlessWebRTC = <Message extends BaseMessage<string, any>>(
+  onMessage: (message: Message) => void
+) => {
   const [peerConnection, setPeerConnection] = useState<RTCPeerConnection>();
   const [localStream, setLocalStream] = useState<MediaStream>();
   const [remoteStream, setRemoteStream] = useState<MediaStream>();
@@ -23,7 +32,10 @@ export const useServerlessWebRTC = (onMessage: (message: string) => void) => {
   useEffect(() => {
     const setup = async () => {
       const peerConnection = new RTCPeerConnection(defaultRTCConfig);
-      const localMediaStream = await getLocalStream();
+      const localMediaStream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: true,
+      });
 
       setPeerConnection(peerConnection);
       setLocalStream(localMediaStream);
@@ -90,12 +102,29 @@ export const useServerlessWebRTC = (onMessage: (message: string) => void) => {
 
     setTextDataChannel(dataChannel);
 
-    dataChannel.onopen = (e) => {
-      console.log("Opened 'text' data channel.", e);
+    dataChannel.onopen = (event) => {
+      console.log("Opened 'text' data channel.", event);
     };
 
-    dataChannel.onmessage = (e) => {
-      onMessage(e.data)
+    dataChannel.onmessage = (event) => {
+      let message: Message | undefined;
+      try {
+        message = JSON.parse(event.data);
+      } catch (error) {
+        console.error("Could not parse message as JSON:", event.data);
+      }
+
+      if (!message) {
+        console.error("A message was not provided.");
+        return;
+      }
+
+      if (!message.type) {
+        console.error("The message did not contain a type");
+        return;
+      }
+
+      onMessage(message);
     };
   }, [peerConnection, localStream]);
 
@@ -118,11 +147,11 @@ export const useServerlessWebRTC = (onMessage: (message: string) => void) => {
     }
   };
 
-  const sendMessage = (message: string) => {
+  const sendMessage = (message: Message) => {
     if (!textDataChannel) return;
 
     console.log("Sending message:", message);
-    textDataChannel.send(message);
+    textDataChannel.send(JSON.stringify(message));
   };
 
   return {
