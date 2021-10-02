@@ -90,6 +90,7 @@ const App = () => {
         <label>Username:</label>
         <input
           value={username}
+          data-lpignore="true"
           onChange={(e) => {
             setUsername(e.target.value);
           }}
