@@ -77,6 +77,7 @@ export const useServerlessWebRTC = <
   }, [isUsingVideo]);
 
   useEffect(() => {
+    console.log("Config of peerConnection", peerConnection);
     if (!peerConnection) return;
 
     peerConnection.ontrack = ({ track, streams }) => {
@@ -111,6 +112,10 @@ export const useServerlessWebRTC = <
       } else if (iceGatheringState === "complete") {
         console.log("Ice gathering complete");
         setIsIceGatheringComplete(true);
+        console.log(
+          "Setting local description, ice:",
+          peerConnection.localDescription
+        );
         setLocalDescription(peerConnection.localDescription || undefined);
       }
     };
@@ -137,7 +142,7 @@ export const useServerlessWebRTC = <
   useEffect(() => {
     if (!peerConnection || !localStream) return;
 
-    let senders: RTCRtpSender[] = [];
+    const senders: RTCRtpSender[] = [];
 
     for (const track of localStream.getTracks()) {
       console.log("Adding local tracks", track);
@@ -202,11 +207,18 @@ export const useServerlessWebRTC = <
       remoteDescriptionString
     ) as RTCSessionDescription;
 
+    console.log("Setting remote description");
     await peerConnection.setRemoteDescription(remoteDescription);
 
     if (remoteDescription.type === "offer") {
+      console.log("Remote was an offer!");
+
       setLocalDescription(undefined);
       await peerConnection.setLocalDescription();
+      console.log(
+        "Setting local description, after remote",
+        peerConnection.localDescription
+      );
       setLocalDescription(peerConnection.localDescription || undefined);
     }
   };

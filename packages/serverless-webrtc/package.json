@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "lib/src/index.js",
-  "files": ["lib/esm/src"],
+  "files": [
+    "lib/esm/src"
+  ],
   "types": "lib/src/index.d.ts",
   "scripts": {
     "build": "pnpm tsc --build",
@@ -18,6 +20,13 @@
   },
   "devDependencies": {
     "@types/react": "^17.0.24",
+    "@typescript-eslint/eslint-plugin": "^4.32.0",
+    "@typescript-eslint/parser": "^4.32.0",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "prettier": "^2.4.1",
     "react": "^17.0.2",
     "rimraf": "^3.0.2",
     "typescript": "^4.4.3"
