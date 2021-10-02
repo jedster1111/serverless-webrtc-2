@@ -90,6 +90,7 @@ const App = () => {
         <label htmlFor="username">Username:</label>
         <input
           id="username"
+          data-lpignore="true"
           value={username}
           onChange={(e) => {
             setUsername(e.target.value);
