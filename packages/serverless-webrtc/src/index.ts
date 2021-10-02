@@ -34,7 +34,7 @@ export const useServerlessWebRTC = <
 >(
   config?: Partial<UseServerlessWebRTCConfig>
 ) => {
-  const { isUsingVideo } = { ...config, ...defaultConfig };
+  const { isUsingVideo } = { ...defaultConfig, ...config };
 
   const [peerConnection, setPeerConnection] = useState<RTCPeerConnection>();
   const [localStream, setLocalStream] = useState<MediaStream>();
@@ -51,14 +51,30 @@ export const useServerlessWebRTC = <
   useEffect(() => {
     const setup = async () => {
       const peerConnection = new RTCPeerConnection(defaultRTCConfig);
-      const localMediaStream = isUsingVideo && (await getLocalMediaStream());
 
       setPeerConnection(peerConnection);
+    };
+
+    setup();
+
+    return () => {
+      setPeerConnection(undefined);
+    };
+  }, []);
+
+  useEffect(() => {
+    const setup = async () => {
+      const localMediaStream = isUsingVideo && (await getLocalMediaStream());
+
       localMediaStream && setLocalStream(localMediaStream);
     };
 
     setup();
-  }, []);
+
+    return () => {
+      setLocalStream(undefined);
+    };
+  }, [isUsingVideo]);
 
   useEffect(() => {
     if (!peerConnection) return;
