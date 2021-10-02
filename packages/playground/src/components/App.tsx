@@ -25,6 +25,8 @@ const App = () => {
     setRemoteDescription,
     sendMessage,
     registerEventHandler,
+    connectionState,
+    isLoading,
   } = useServerlessWebRTC<Messages["type"], Messages>({
     iceServers,
   });
@@ -40,12 +42,15 @@ const App = () => {
   }, []);
   return (
     <div className="app">
-      <h1>Hello World!</h1>
+      <div>
+        {isLoading && <div>Loading...</div>}
+        <div>{connectionState}</div>
+      </div>
       <div>
         <button
-          disabled={!localDescription}
+          disabled={isLoading}
           onClick={() => {
-            localDescription && navigator.clipboard.writeText(localDescription);
+            !isLoading && localDescription && navigator.clipboard.writeText(localDescription);
           }}
         >
           Copy local description

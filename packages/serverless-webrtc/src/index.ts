@@ -40,6 +40,9 @@ export const useServerlessWebRTC = <
 
   const [peerConnection, setPeerConnection] = useState<RTCPeerConnection>();
   const [dataChannel, setDataChannel] = useState<RTCDataChannel>();
+  const [connectionState, setConnectionState] = useState<
+    RTCPeerConnectionState | "initial"
+  >("initial");
   const [isIceGatheringComplete, setIsIceGatheringComplete] = useState(false);
   const [localDescription, setLocalDescription] =
     useState<RTCSessionDescription>();
@@ -65,38 +68,23 @@ export const useServerlessWebRTC = <
 
       setDataChannel(dataChannel);
 
-      dataChannel.onopen = (event) => {
-        console.log("Opened 'text' data channel.", event);
-      };
-
       peerConnection.onnegotiationneeded = async () => {
         await peerConnection.setLocalDescription();
-        console.log(
-          "On negotiation needed! Setting local description.",
-          peerConnection.localDescription
-        );
       };
 
       peerConnection.onicegatheringstatechange = () => {
         const iceGatheringState = peerConnection.iceGatheringState;
-        console.log("Ice gathering state change:", iceGatheringState);
         if (iceGatheringState === "new" || iceGatheringState === "gathering") {
           setIsIceGatheringComplete(false);
         } else if (iceGatheringState === "complete") {
           setIsIceGatheringComplete(true);
-          console.log(
-            "Setting localDescription after ice gathering completed:",
-            peerConnection.localDescription
-          );
           setLocalDescription(peerConnection.localDescription || undefined);
         }
       };
 
       peerConnection.onconnectionstatechange = () => {
         const connectionState = peerConnection.connectionState;
-        if (connectionState === "disconnected") {
-          console.log("Disconnected!");
-        }
+        setConnectionState(connectionState);
       };
 
       shouldContinue && setPeerConnection(peerConnection);
@@ -117,11 +105,6 @@ export const useServerlessWebRTC = <
 
   useEffect(() => {
     if (!dataChannel) return;
-
-    console.log(
-      "Setting up data channel handlers!",
-      Object.keys(messageHandlers)
-    );
 
     dataChannel.onmessage = (event) => {
       let message: FindByType<Message, MessageTypes> | undefined;
@@ -165,18 +148,11 @@ export const useServerlessWebRTC = <
       remoteDescriptionString
     ) as RTCSessionDescription;
 
-    console.log("Setting remote description");
     await peerConnection.setRemoteDescription(remoteDescription);
 
     if (remoteDescription.type === "offer") {
-      console.log("Remote was an offer!");
-
       setLocalDescription(undefined);
       await peerConnection.setLocalDescription();
-      console.log(
-        "Setting local description, after remote",
-        peerConnection.localDescription
-      );
       setLocalDescription(peerConnection.localDescription || undefined);
     }
   };
@@ -184,7 +160,6 @@ export const useServerlessWebRTC = <
   const sendMessage = (message: Message) => {
     if (!dataChannel) return;
 
-    console.log("Sending message:", message);
     dataChannel.send(JSON.stringify(message));
   };
 
@@ -192,7 +167,6 @@ export const useServerlessWebRTC = <
     messageType: T,
     handler: (message: FindByType<Message, T>) => void
   ) => {
-    console.log("Registering handler for message with type:", messageType);
     setMessageHandlers((prev) => ({
       ...prev,
       [messageType]: handler,
@@ -200,13 +174,11 @@ export const useServerlessWebRTC = <
   };
 
   return {
-    localDescription:
-      isIceGatheringComplete && localDescription
-        ? JSON.stringify(localDescription)
-        : undefined,
+    localDescription: JSON.stringify(localDescription),
     setRemoteDescription,
     sendMessage,
     registerEventHandler,
-    isIceGatheringComplete,
+    isLoading: !isIceGatheringComplete,
+    connectionState,
   };
 };
