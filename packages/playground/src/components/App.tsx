@@ -87,10 +87,8 @@ const App = () => {
         </button>
       </div>
       <div>
-        <label htmlFor="username">Username:</label>
+        <label>Username:</label>
         <input
-          id="username"
-          data-lpignore="true"
           value={username}
           onChange={(e) => {
             setUsername(e.target.value);
