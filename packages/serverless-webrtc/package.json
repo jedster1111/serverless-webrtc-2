@@ -15,6 +15,7 @@
   },
   "author": "",
   "license": "ISC",
+  "repository": "https://github.com/jedster1111/serverless-webrtc-2",
   "peerDependencies": {
     "react": "17.x"
   },
