@@ -11,6 +11,8 @@ const App = () => {
   const [remoteDescriptionString, setRemoteDescriptionString] = useState("");
   const [message, setMessage] = useState("");
 
+  const [isUsingVideo, setIsUsingVideo] = useState(true);
+
   const {
     localDescription,
     setRemoteDescription,
@@ -18,7 +20,7 @@ const App = () => {
     remoteStream,
     sendMessage,
     registerEventHandler,
-  } = useServerlessWebRTC<Messages["type"], Messages>();
+  } = useServerlessWebRTC<Messages["type"], Messages>({ isUsingVideo });
 
   useEffect(() => {
     registerEventHandler("text-message", (message) => {
@@ -39,6 +41,13 @@ const App = () => {
           }}
         >
           Copy local description
+        </button>
+        <button
+          onClick={() => {
+            setIsUsingVideo((oldValue) => !oldValue);
+          }}
+        >
+          Toggle video
         </button>
       </div>
       <div>
