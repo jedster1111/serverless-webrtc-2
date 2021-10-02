@@ -26,9 +26,47 @@ type UseServerlessWebRTCConfig = {
   iceServers: string[];
 };
 
+type ConnectionState =
+  | "initial"
+  | "waitingForRemoteDescription"
+  | "needToSendLocalDescription"
+  | "connected"
+  | "disconnected";
+
 const defaultConfig: UseServerlessWebRTCConfig = {
   iceServers: [],
 };
+
+function calculateConnectionState(
+  rtcConnectionState: RTCPeerConnectionState,
+  hasRemoteDescription: boolean
+): ConnectionState {
+  if (rtcConnectionState === "new") {
+    return "initial";
+  }
+
+  if (rtcConnectionState === "connecting") {
+    if (!hasRemoteDescription) {
+      return "waitingForRemoteDescription";
+    } else {
+      return "needToSendLocalDescription";
+    }
+  }
+
+  if (rtcConnectionState === "connected") {
+    return "connected";
+  }
+
+  if (
+    rtcConnectionState === "closed" ||
+    rtcConnectionState === "disconnected" ||
+    rtcConnectionState === "failed"
+  ) {
+    return "disconnected";
+  }
+
+  return "disconnected";
+}
 
 export const useServerlessWebRTC = <
   MessageTypes extends string,
@@ -40,12 +78,14 @@ export const useServerlessWebRTC = <
 
   const [peerConnection, setPeerConnection] = useState<RTCPeerConnection>();
   const [dataChannel, setDataChannel] = useState<RTCDataChannel>();
-  const [connectionState, setConnectionState] = useState<
-    RTCPeerConnectionState | "initial"
-  >("initial");
+  const [rtcConnectionState, setRTCConnectionState] =
+    useState<RTCPeerConnectionState>("new");
+
   const [isIceGatheringComplete, setIsIceGatheringComplete] = useState(false);
   const [localDescription, setLocalDescription] =
     useState<RTCSessionDescription>();
+  const [hasRemoteDescription, setHasRemoteDescription] =
+    useState<boolean>(false);
 
   const [messageHandlers, setMessageHandlers] = useState<{
     [T in Message["type"]]?: (message: FindByType<Message, T>) => void;
@@ -84,7 +124,7 @@ export const useServerlessWebRTC = <
 
       peerConnection.onconnectionstatechange = () => {
         const connectionState = peerConnection.connectionState;
-        setConnectionState(connectionState);
+        setRTCConnectionState(connectionState);
       };
 
       shouldContinue && setPeerConnection(peerConnection);
@@ -149,6 +189,7 @@ export const useServerlessWebRTC = <
     ) as RTCSessionDescription;
 
     await peerConnection.setRemoteDescription(remoteDescription);
+    setHasRemoteDescription(true);
 
     if (remoteDescription.type === "offer") {
       setLocalDescription(undefined);
@@ -179,6 +220,9 @@ export const useServerlessWebRTC = <
     sendMessage,
     registerEventHandler,
     isLoading: !isIceGatheringComplete,
-    connectionState,
+    connectionState: calculateConnectionState(
+      rtcConnectionState,
+      hasRemoteDescription
+    ),
   };
 };

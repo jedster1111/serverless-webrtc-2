@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useServerlessWebRTC, BaseMessage } from "serverless-webrtc";
-import ReactPlayer from "react-player";
 
 type Messages = TextMessage | PingMessage;
 
@@ -40,39 +39,72 @@ const App = () => {
       console.log("Received ping-message.");
     });
   }, []);
+
+  const getMessage = () => {
+    if (connectionState === "initial") {
+      return "To start a call, copy the local description and send it to a friend. To answer a call, take your friend's description, paste it into the connect box and press connect.";
+    }
+
+    if (connectionState === "waitingForRemoteDescription") {
+      return "Now get your friend to send you their local description. Paste it into the connect box and press connect.";
+    }
+
+    if (connectionState === "needToSendLocalDescription") {
+      return "Now copy your local description and send it to your friend.";
+    }
+
+    if (connectionState === "connected") {
+      return "You are now connected, try sending each other a message!";
+    }
+
+    if (connectionState === "disconnected") {
+      return "Something's gone wrong and you are disconnected. Try refreshing the page and starting the connection process again.";
+    }
+
+    return undefined;
+  };
+
   return (
     <div className="app">
       <div>
         {isLoading && <div>Loading...</div>}
-        <div>{connectionState}</div>
+        <div>{getMessage()}</div>
       </div>
-      <div>
-        <button
-          disabled={isLoading}
-          onClick={() => {
-            !isLoading && localDescription && navigator.clipboard.writeText(localDescription);
-          }}
-        >
-          Copy local description
-        </button>
-      </div>
-      <div>
-        <input
-          value={remoteDescriptionString}
-          onChange={(e) => {
-            setRemoteDescriptionString(e.target.value);
-          }}
-        />
-        <button
-          onClick={() => {
-            if (!remoteDescriptionString) return;
+      {(connectionState === "initial" ||
+        connectionState === "needToSendLocalDescription") && (
+        <div>
+          <button
+            disabled={isLoading}
+            onClick={() => {
+              !isLoading &&
+                localDescription &&
+                navigator.clipboard.writeText(localDescription);
+            }}
+          >
+            Copy local description
+          </button>
+        </div>
+      )}
+      {(connectionState === "initial" ||
+        connectionState === "waitingForRemoteDescription") && (
+        <div>
+          <input
+            value={remoteDescriptionString}
+            onChange={(e) => {
+              setRemoteDescriptionString(e.target.value);
+            }}
+          />
+          <button
+            onClick={() => {
+              if (!remoteDescriptionString) return;
 
-            setRemoteDescription(remoteDescriptionString);
-          }}
-        >
-          Connect
-        </button>
-      </div>
+              setRemoteDescription(remoteDescriptionString);
+            }}
+          >
+            Connect
+          </button>
+        </div>
+      )}
 
       <div>
         <input
