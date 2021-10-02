@@ -26,7 +26,7 @@ importers:
       react-dom: 17.0.2
       react-player: ^2.9.0
       rimraf: ^3.0.2
-      serverless-webrtc: workspace:1.0.0
+      serverless-webrtc-react: workspace:1.0.0
       style-loader: ^3.3.0
       ts-loader: ^9.2.6
       typescript: ^4.4.3
@@ -38,7 +38,7 @@ importers:
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       react-player: 2.9.0_react@17.0.2
-      serverless-webrtc: link:../serverless-webrtc
+      serverless-webrtc-react: link:../serverless-webrtc
     devDependencies:
       '@types/react-dom': 17.0.9
       css-loader: 6.3.0_webpack@5.54.0

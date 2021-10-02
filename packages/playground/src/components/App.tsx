@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useServerlessWebRTC, BaseMessage } from "serverless-webrtc";
+import { useServerlessWebRTC, BaseMessage } from "serverless-webrtc-react";
 
 type Messages = TextMessage | PingMessage;
 
