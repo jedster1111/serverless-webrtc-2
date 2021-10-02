@@ -25,7 +25,19 @@ jobs:
         run: pnpm build
         working-directory: ./packages/serverless-webrtc
 
-      - uses: JS-DevTools/npm-publish@v1
+      - name: Publish to NPM
+        uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.NPM_TOKEN }}
           package: ./packages/serverless-webrtc/package.json
+
+      - name: Deploy playground to Netlify
+        uses: nwtgck/actions-netlify@v1.2
+        with:
+          publish-dir: "./packages/playground/dist"
+          production-branch: main
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          enable-commit-comment: true
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
