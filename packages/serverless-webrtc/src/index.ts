@@ -20,10 +20,22 @@ const defaultRTCConfig: RTCConfiguration = {
   // iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
 };
 
+type UseServerlessWebRTCConfig = {
+  isUsingVideo: boolean;
+};
+
+const defaultConfig: UseServerlessWebRTCConfig = {
+  isUsingVideo: false,
+};
+
 export const useServerlessWebRTC = <
   MessageTypes extends string,
   Message extends BaseMessage<MessageTypes, any>
->() => {
+>(
+  config?: Partial<UseServerlessWebRTCConfig>
+) => {
+  const { isUsingVideo } = { ...config, ...defaultConfig };
+
   const [peerConnection, setPeerConnection] = useState<RTCPeerConnection>();
   const [localStream, setLocalStream] = useState<MediaStream>();
   const [remoteStream, setRemoteStream] = useState<MediaStream>();
@@ -39,10 +51,10 @@ export const useServerlessWebRTC = <
   useEffect(() => {
     const setup = async () => {
       const peerConnection = new RTCPeerConnection(defaultRTCConfig);
-      const localMediaStream = await getLocalMediaStream();
+      const localMediaStream = isUsingVideo && (await getLocalMediaStream());
 
       setPeerConnection(peerConnection);
-      setLocalStream(localMediaStream);
+      localMediaStream && setLocalStream(localMediaStream);
     };
 
     setup();
