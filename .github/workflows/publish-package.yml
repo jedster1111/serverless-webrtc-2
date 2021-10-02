@@ -21,9 +21,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build
-        run: pnpm build
+      - name: Build serverless-webrtc-react
         working-directory: ./packages/serverless-webrtc
+        run: pnpm build
+
+      - name: Build playground
+        working-directory: ./packages/playground
+        run: pnpm build
 
       - name: Publish to NPM
         uses: JS-DevTools/npm-publish@v1
