@@ -11,7 +11,7 @@ const App = () => {
   const [remoteDescriptionString, setRemoteDescriptionString] = useState("");
   const [messageValue, setMessageValue] = useState("");
 
-  const [username, setUsername] = useState("Some User");
+  const [name, setName] = useState("John Doe");
 
   const [messages, setMessages] = useState<{ from: string; value: string }[]>(
     []
@@ -87,12 +87,12 @@ const App = () => {
         </button>
       </div>
       <div>
-        <label>Username:</label>
+        <label htmlFor="name">Name:</label>
         <input
-          value={username}
-          data-lpignore="true"
+          id="name"
+          value={name}
           onChange={(e) => {
-            setUsername(e.target.value);
+            setName(e.target.value);
           }}
         />
       </div>
@@ -141,7 +141,7 @@ const App = () => {
         />
         <button
           onClick={() => {
-            const message = { value: messageValue, from: username };
+            const message = { value: messageValue, from: name };
             sendMessage("text-message", message);
             addMessage(message);
             setMessageValue("");
