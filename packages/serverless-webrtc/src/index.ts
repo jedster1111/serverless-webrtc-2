@@ -17,7 +17,7 @@ type MessageWithoutData<T extends string> = {
 };
 
 const defaultRTCConfig: RTCConfiguration = {
-  iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+  // iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
 };
 
 export const useServerlessWebRTC = <
@@ -39,10 +39,7 @@ export const useServerlessWebRTC = <
   useEffect(() => {
     const setup = async () => {
       const peerConnection = new RTCPeerConnection(defaultRTCConfig);
-      const localMediaStream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: true,
-      });
+      const localMediaStream = await getLocalMediaStream();
 
       setPeerConnection(peerConnection);
       setLocalStream(localMediaStream);
@@ -52,12 +49,7 @@ export const useServerlessWebRTC = <
   }, []);
 
   useEffect(() => {
-    if (!peerConnection || !localStream) return;
-
-    for (const track of localStream.getTracks()) {
-      console.log("Adding local tracks", track);
-      peerConnection.addTrack(track, localStream);
-    }
+    if (!peerConnection) return;
 
     peerConnection.ontrack = ({ track, streams }) => {
       console.log("Received remote track!", track.id);
@@ -111,6 +103,24 @@ export const useServerlessWebRTC = <
 
     dataChannel.onopen = (event) => {
       console.log("Opened 'text' data channel.", event);
+    };
+  }, [peerConnection]);
+
+  useEffect(() => {
+    if (!peerConnection || !localStream) return;
+
+    let senders: RTCRtpSender[] = [];
+
+    for (const track of localStream.getTracks()) {
+      console.log("Adding local tracks", track);
+      const sender = peerConnection.addTrack(track, localStream);
+      senders.push(sender);
+    }
+
+    return () => {
+      for (const sender of senders) {
+        peerConnection.removeTrack(sender);
+      }
     };
   }, [peerConnection, localStream]);
 
@@ -201,5 +211,17 @@ export const useServerlessWebRTC = <
     remoteStream,
     sendMessage,
     registerEventHandler,
+    isIceGatheringComplete,
   };
 };
+
+async function getLocalMediaStream() {
+  try {
+    return await navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: true,
+    });
+  } catch {
+    return undefined;
+  }
+}
