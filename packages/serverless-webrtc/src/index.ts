@@ -2,18 +2,9 @@ import { useState, useEffect } from "react";
 
 type FindByType<Union, Type> = Union extends { type: Type } ? Union : never;
 
-export type BaseMessage<
-  T extends string = string,
-  D = undefined
-> = D extends undefined ? MessageWithoutData<T> : MessageWithData<T, D>;
-
-type MessageWithData<T extends string, D> = {
+export type BaseMessage<T extends string = string, D = undefined> = {
   type: T;
   data: D;
-};
-
-type MessageWithoutData<T extends string> = {
-  type: T;
 };
 
 type UseServerlessWebRTCConfig = {
@@ -205,8 +196,16 @@ export const useServerlessWebRTC = <
     }
   };
 
-  const sendMessage = (message: Message) => {
+  const sendMessage = <T extends Message["type"]>(
+    messageType: T,
+    data: FindByType<Message, T>["data"]
+  ) => {
     if (!dataChannel) return;
+
+    const message: BaseMessage<T, typeof data> = {
+      type: messageType,
+      data,
+    };
 
     dataChannel.send(JSON.stringify(message));
   };

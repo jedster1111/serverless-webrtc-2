@@ -142,10 +142,7 @@ const App = () => {
         <button
           onClick={() => {
             const message = { value: messageValue, from: username };
-            sendMessage({
-              type: "text-message",
-              data: message,
-            });
+            sendMessage("text-message", message);
             addMessage(message);
             setMessageValue("");
           }}
@@ -156,7 +153,7 @@ const App = () => {
       <div>
         <button
           onClick={() => {
-            sendMessage({ type: "ping" });
+            sendMessage("ping", undefined);
           }}
         >
           Send Ping Message
