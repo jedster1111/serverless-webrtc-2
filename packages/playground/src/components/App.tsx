@@ -6,9 +6,6 @@ type Messages = TextMessage | PingMessage;
 type TextMessage = BaseMessage<"text-message", string>;
 type PingMessage = BaseMessage<"ping">;
 
-// const iceServers = ["stun:stun.l.google.com:19302"];
-const iceServers: string[] = [];
-
 const App = () => {
   const [remoteDescriptionString, setRemoteDescriptionString] = useState("");
   const [message, setMessage] = useState("");
@@ -27,7 +24,7 @@ const App = () => {
     connectionState,
     isLoading,
   } = useServerlessWebRTC<Messages["type"], Messages>({
-    iceServers,
+    useIceServer: true
   });
 
   useEffect(() => {

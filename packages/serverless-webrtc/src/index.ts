@@ -18,12 +18,12 @@ type MessageWithoutData<T extends string> = {
 
 type UseServerlessWebRTCConfig = {
   /**
-   * For instance: `stun:stun.l.google.com:19302`
+   * When connecting to someone on the same network, not using an ICE server will significantly reduce the time required to set up a connection.
+   * When trying to connect with people on a separate network, a real ice server may be required.
    *
-   * When running locally, just trying to connect to yourself, leaving this empty will significantly reduce the time required to set up a connection.
-   * When trying to connect with other people on different networks, a real ice server may be required.
+   * Defaults to false.
    */
-  iceServers: string[];
+  useIceServer: boolean;
 };
 
 type ConnectionState =
@@ -34,7 +34,7 @@ type ConnectionState =
   | "disconnected";
 
 const defaultConfig: UseServerlessWebRTCConfig = {
-  iceServers: [],
+  useIceServer: false,
 };
 
 function calculateConnectionState(
@@ -74,7 +74,7 @@ export const useServerlessWebRTC = <
 >(
   config?: Partial<UseServerlessWebRTCConfig>
 ) => {
-  const { iceServers } = { ...defaultConfig, ...config };
+  const { useIceServer } = { ...defaultConfig, ...config };
 
   const [peerConnection, setPeerConnection] = useState<RTCPeerConnection>();
   const [dataChannel, setDataChannel] = useState<RTCDataChannel>();
@@ -98,7 +98,9 @@ export const useServerlessWebRTC = <
 
     const setup = async () => {
       peerConnection = new RTCPeerConnection({
-        iceServers: iceServers.map((iceServer) => ({ urls: iceServer })),
+        iceServers: useIceServer
+          ? [{ urls: "stun:stun.l.google.com:19302" }]
+          : [],
       });
 
       const dataChannel = peerConnection.createDataChannel("text", {
@@ -140,8 +142,13 @@ export const useServerlessWebRTC = <
       }
 
       setPeerConnection(undefined);
+      setDataChannel(undefined);
+      setRTCConnectionState("new");
+      setLocalDescription(undefined);
+      setIsIceGatheringComplete(false);
+      setHasRemoteDescription(false);
     };
-  }, [iceServers]);
+  }, [useIceServer]);
 
   useEffect(() => {
     if (!dataChannel) return;
