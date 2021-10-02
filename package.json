@@ -5,7 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "eslint-scope": "^5.1.1",
-    "mime-types": "^2.1.32",
+    "mime-types": "^2.1.33",
     "multicast-dns-service-types": "^1.1.0"
   },
   "devDependencies": {

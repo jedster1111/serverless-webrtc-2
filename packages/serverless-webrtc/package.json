@@ -1,10 +1,10 @@
 {
   "name": "serverless-webrtc-react",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "lib/src/index.js",
   "files": [
-    "lib/esm/src"
+    "lib/src"
   ],
   "types": "lib/src/index.d.ts",
   "scripts": {
@@ -19,7 +19,7 @@
     "react": "17.x"
   },
   "devDependencies": {
-    "@types/react": "^17.0.24",
+    "@types/react": "^17.0.26",
     "@typescript-eslint/eslint-plugin": "^4.32.0",
     "@typescript-eslint/parser": "^4.32.0",
     "eslint": "^7.32.0",
