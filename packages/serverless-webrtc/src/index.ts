@@ -16,14 +16,28 @@ type MessageWithoutData<T extends string> = {
   type: T;
 };
 
-const defaultRTCConfig: RTCConfiguration = {
-  // iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+type UseServerlessWebRTCConfig = {
+  /**
+   * For instance: `stun:stun.l.google.com:19302`
+   *
+   * When running locally, just trying to connect to yourself, leaving this empty will significantly reduce the time required to set up a connection.
+   * When trying to connect with other people on different networks, a real ice server may be required.
+   */
+  iceServers: string[];
+};
+
+const defaultConfig: UseServerlessWebRTCConfig = {
+  iceServers: [],
 };
 
 export const useServerlessWebRTC = <
   MessageTypes extends string,
   Message extends BaseMessage<MessageTypes, any>
->() => {
+>(
+  config?: Partial<UseServerlessWebRTCConfig>
+) => {
+  const { iceServers } = { ...defaultConfig, ...config };
+
   const [peerConnection, setPeerConnection] = useState<RTCPeerConnection>();
   const [dataChannel, setDataChannel] = useState<RTCDataChannel>();
   const [isIceGatheringComplete, setIsIceGatheringComplete] = useState(false);
@@ -40,7 +54,9 @@ export const useServerlessWebRTC = <
     const senders: RTCRtpSender[] = [];
 
     const setup = async () => {
-      peerConnection = new RTCPeerConnection(defaultRTCConfig);
+      peerConnection = new RTCPeerConnection({
+        iceServers: iceServers.map((iceServer) => ({ urls: iceServer })),
+      });
 
       const dataChannel = peerConnection.createDataChannel("text", {
         negotiated: true,
@@ -97,7 +113,7 @@ export const useServerlessWebRTC = <
 
       setPeerConnection(undefined);
     };
-  }, []);
+  }, [iceServers]);
 
   useEffect(() => {
     if (!dataChannel) return;
