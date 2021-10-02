@@ -7,6 +7,7 @@ type TextMessage = BaseMessage<"text-message", { value: string; from: string }>;
 type PingMessage = BaseMessage<"ping">;
 
 const App = () => {
+  const [isPeerOnSameNetwork, setIsPeerOnSameNetwork] = useState(true);
   const [remoteDescriptionString, setRemoteDescriptionString] = useState("");
   const [messageValue, setMessageValue] = useState("");
 
@@ -28,7 +29,7 @@ const App = () => {
     connectionState,
     isLoading,
   } = useServerlessWebRTC<Messages["type"], Messages>({
-    useIceServer: true,
+    useIceServer: !isPeerOnSameNetwork,
   });
 
   useEffect(() => {
@@ -70,6 +71,20 @@ const App = () => {
       <div>
         {isLoading && <div>Loading...</div>}
         <div>{getMessage()}</div>
+      </div>
+      <div>
+        <div>
+          {isPeerOnSameNetwork
+            ? "Peer is on the same network"
+            : "Peer is not on the same network"}
+        </div>
+        <button
+          onClick={() => {
+            setIsPeerOnSameNetwork((prev) => !prev);
+          }}
+        >
+          Toggle is peer on same network
+        </button>
       </div>
       <div>
         <label htmlFor="username">Username:</label>
