@@ -11,20 +11,23 @@ const App = () => {
   const [remoteDescriptionString, setRemoteDescriptionString] = useState("");
   const [message, setMessage] = useState("");
 
-  const [isUsingVideo, setIsUsingVideo] = useState(true);
+  const [messages, setMessages] = useState<string[]>([]);
+
+  const addMessage = (newMessage: string) => {
+    setMessages((prev) => [...prev, newMessage]);
+  };
 
   const {
     localDescription,
     setRemoteDescription,
-    localStream,
-    remoteStream,
     sendMessage,
     registerEventHandler,
-  } = useServerlessWebRTC<Messages["type"], Messages>({ isUsingVideo });
+  } = useServerlessWebRTC<Messages["type"], Messages>();
 
   useEffect(() => {
     registerEventHandler("text-message", (message) => {
       console.log("Received text-message:", message.data);
+      addMessage(message.data);
     });
     registerEventHandler("ping", () => {
       console.log("Received ping-message.");
@@ -41,13 +44,6 @@ const App = () => {
           }}
         >
           Copy local description
-        </button>
-        <button
-          onClick={() => {
-            setIsUsingVideo((oldValue) => !oldValue);
-          }}
-        >
-          Toggle video
         </button>
       </div>
       <div>
@@ -78,6 +74,7 @@ const App = () => {
         <button
           onClick={() => {
             sendMessage({ type: "text-message", data: message });
+            addMessage(message);
             setMessage("");
           }}
         >
@@ -93,11 +90,14 @@ const App = () => {
           Send Ping Message
         </button>
       </div>
-
-      {localStream && <p>Local</p>}
-      {localStream && <ReactPlayer url={localStream} controls muted playing />}
-      <p>Remote</p>
-      {remoteStream && <ReactPlayer url={remoteStream} controls muted />}
+      <div>
+        <p>Messages</p>
+        <ul>
+          {messages.map((message, index) => (
+            <li key={index}>{message}</li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };
