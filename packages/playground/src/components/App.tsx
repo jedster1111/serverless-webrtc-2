@@ -3,16 +3,20 @@ import { useServerlessWebRTC, BaseMessage } from "serverless-webrtc";
 
 type Messages = TextMessage | PingMessage;
 
-type TextMessage = BaseMessage<"text-message", string>;
+type TextMessage = BaseMessage<"text-message", { value: string; from: string }>;
 type PingMessage = BaseMessage<"ping">;
 
 const App = () => {
   const [remoteDescriptionString, setRemoteDescriptionString] = useState("");
-  const [message, setMessage] = useState("");
+  const [messageValue, setMessageValue] = useState("");
 
-  const [messages, setMessages] = useState<string[]>([]);
+  const [username, setUsername] = useState("Some User");
 
-  const addMessage = (newMessage: string) => {
+  const [messages, setMessages] = useState<{ from: string; value: string }[]>(
+    []
+  );
+
+  const addMessage = (newMessage: TextMessage["data"]) => {
     setMessages((prev) => [...prev, newMessage]);
   };
 
@@ -24,7 +28,7 @@ const App = () => {
     connectionState,
     isLoading,
   } = useServerlessWebRTC<Messages["type"], Messages>({
-    useIceServer: true
+    useIceServer: true,
   });
 
   useEffect(() => {
@@ -67,6 +71,16 @@ const App = () => {
         {isLoading && <div>Loading...</div>}
         <div>{getMessage()}</div>
       </div>
+      <div>
+        <label htmlFor="username">Username:</label>
+        <input
+          id="username"
+          value={username}
+          onChange={(e) => {
+            setUsername(e.target.value);
+          }}
+        />
+      </div>
       {(connectionState === "initial" ||
         connectionState === "needToSendLocalDescription") && (
         <div>
@@ -105,16 +119,20 @@ const App = () => {
 
       <div>
         <input
-          value={message}
+          value={messageValue}
           onChange={(e) => {
-            setMessage(e.target.value);
+            setMessageValue(e.target.value);
           }}
         />
         <button
           onClick={() => {
-            sendMessage({ type: "text-message", data: message });
+            const message = { value: messageValue, from: username };
+            sendMessage({
+              type: "text-message",
+              data: message,
+            });
             addMessage(message);
-            setMessage("");
+            setMessageValue("");
           }}
         >
           Send Text Message
@@ -133,7 +151,9 @@ const App = () => {
         <p>Messages</p>
         <ul>
           {messages.map((message, index) => (
-            <li key={index}>{message}</li>
+            <li key={index}>
+              {message.from}: {message.value}
+            </li>
           ))}
         </ul>
       </div>
