@@ -8,8 +8,7 @@
     "build:clean": "pnpm run clean-dist && pnpm run build",
     "clean-dist": "rimraf dist/*",
     "start": "pnpm run start-dev",
-    "start-dev": "webpack serve --config=configs/webpack/dev.js",
-    "preinstall": "npx only-allow pnpm"
+    "start-dev": "webpack serve --config=configs/webpack/dev.js"
   },
   "author": "",
   "license": "ISC",
