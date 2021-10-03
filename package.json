@@ -12,8 +12,7 @@
     "typescript": "^4.4.3"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "preinstall": "npx only-allow pnpm"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC"
