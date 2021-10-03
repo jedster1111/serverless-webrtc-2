@@ -17,12 +17,14 @@ type UseServerlessWebRTCConfig = {
   useIceServer: boolean;
 };
 
-type ConnectionState =
+export type ConnectionState =
   | "initial"
   | "waitingForRemoteDescription"
   | "needToSendLocalDescription"
   | "connected"
   | "disconnected";
+
+export type ServerlessWebRTC = ReturnType<typeof useServerlessWebRTC>;
 
 const defaultConfig: UseServerlessWebRTCConfig = {
   useIceServer: false,
