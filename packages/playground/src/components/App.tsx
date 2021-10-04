@@ -33,14 +33,22 @@ const App = () => {
   });
 
   useEffect(() => {
-    registerEventHandler("text-message", (message) => {
-      console.log("Received text-message:", message.data);
-      addMessage(message.data);
-    });
-    registerEventHandler("ping", () => {
+    const unregisterTextMessage = registerEventHandler(
+      "text-message",
+      (message) => {
+        console.log("Received text-message:", message.data);
+        addMessage(message.data);
+      }
+    );
+    const unregisterPingMessage = registerEventHandler("ping", () => {
       console.log("Received ping-message.");
     });
-  }, []);
+
+    return () => {
+      unregisterTextMessage();
+      unregisterPingMessage();
+    };
+  }, [registerEventHandler]);
 
   return (
     <div className="app">

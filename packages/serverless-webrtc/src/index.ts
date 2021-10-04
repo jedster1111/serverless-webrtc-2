@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 type FindByType<Union, Type> = Union extends { type: Type } ? Union : never;
 
@@ -212,15 +212,27 @@ export const useServerlessWebRTC = <
     dataChannel.send(JSON.stringify(message));
   };
 
-  const registerEventHandler = <T extends Message["type"]>(
-    messageType: T,
-    handler: (message: FindByType<Message, T>) => void
-  ) => {
-    setMessageHandlers((prev) => ({
-      ...prev,
-      [messageType]: handler,
-    }));
-  };
+  const registerEventHandler = useCallback(
+    <T extends Message["type"]>(
+      messageType: T,
+      handler: (message: FindByType<Message, T>) => void
+    ) => {
+      setMessageHandlers((prev) => ({
+        ...prev,
+        [messageType]: handler,
+      }));
+
+      return () => {
+        setMessageHandlers((prev) => {
+          const newHandlers = { ...prev };
+          delete newHandlers[messageType];
+
+          return newHandlers;
+        });
+      };
+    },
+    []
+  );
 
   return {
     localDescription: JSON.stringify(localDescription),
