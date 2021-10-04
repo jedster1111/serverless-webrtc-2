@@ -3,7 +3,7 @@
     "composite": true,
     "target": "ES6",
     "jsx": "react",
-    "module": "ESNext", 
+    "module": "CommonJS", 
     "moduleResolution": "node",
     "declaration": true,
     "declarationMap": true,
