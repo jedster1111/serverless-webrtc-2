@@ -236,10 +236,10 @@ export const useServerlessWebRTC = <
 
   return {
     localDescription: JSON.stringify(localDescription),
+    isLocalDescriptionReady: !isIceGatheringComplete,
     setRemoteDescription,
     sendMessage,
     registerEventHandler,
-    isLoading: !isIceGatheringComplete,
     connectionState: calculateConnectionState(
       rtcConnectionState,
       hasRemoteDescription

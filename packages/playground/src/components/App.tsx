@@ -27,7 +27,7 @@ const App = () => {
     sendMessage,
     registerEventHandler,
     connectionState,
-    isLoading,
+    isLocalDescriptionReady,
   } = useServerlessWebRTC<Messages["type"], Messages>({
     useIceServer: !isPeerOnSameNetwork,
   });
@@ -79,7 +79,7 @@ const App = () => {
 
       <ConnectionWidget
         connectionState={connectionState}
-        isLoading={isLoading}
+        isLoading={isLocalDescriptionReady}
         localDescription={localDescription}
         setRemoteDescription={setRemoteDescription}
       />
