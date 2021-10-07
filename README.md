@@ -11,3 +11,10 @@ Provides a react hook to set up a connection with a peer.
 ### playground
 
 Sample app to test out functionalities of serverless-webrtc
+
+## Local development
+
+```
+# Publish a new version. Can pass patch (default), minor or major as an argument)
+pnpm run publish-new-version
+```
