@@ -12,7 +12,7 @@
     "typescript": "^4.4.3"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "publish-new-version": "./scripts/bump-version.sh"
   },
   "author": "",
   "license": "ISC"
